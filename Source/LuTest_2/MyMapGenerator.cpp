@@ -1,7 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyMapGenerator.h"
 
+#include "Barrier_1.h"
+#include "Barrier_2.h"
+#include"Tree.h"
+#include "SkeletonArcherCharacter.h"
 #include "Hex.hpp"
 #include "Grid.hpp"
 #include "TransformCoordinate.hpp"
@@ -9,6 +13,7 @@
 #include "PathSearch.hpp"
 #include "HexActor.h"
 
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values
 AMyMapGenerator::AMyMapGenerator()
@@ -33,47 +38,67 @@ void AMyMapGenerator::Tick(float DeltaTime)
 
 }
 
+void AMyMapGenerator::GenerateMainCharacter(AHexActor & _hexActor, FVector & m_SpawnMainCharacterCoordinate)
+{
+    if (BP_ArcherCharacter)
+    {
+        FActorSpawnParameters spawnParams;
 
-void AMyMapGenerator::GenerateMap(
+        FTransform transform = GetTransform();
+        FVector hexLocation = _hexActor.GetActorTransform().GetLocation();
+        //hexLocation.X -= ViewCoordinateGenerator::innerRadius / 2;
+        //hexLocation.Y -= ViewCoordinateGenerator::innerRadius / 2;
+
+        hexLocation.Z += 20;
+        transform.SetLocation(hexLocation);
+        transform.SetScale3D(FVector(0.2, 0.2, 0.2));
+        ASkeletonArcherCharacter * actor = GetWorld()->SpawnActor<ASkeletonArcherCharacter>(BP_ArcherCharacter, transform, spawnParams);
+        m_SkeletonArcherCharacter.Add(actor);
+        _hexActor.SetMainCharacter(actor);
+    }
+}
+
+//void AMyMapGenerator::GenerateEnemy(Hex *hex, FTransform & transform, StepAccessibility & access)
+
+
+void AMyMapGenerator::GenerateMap
+(
       ViewCoordinateGenerator * _pViewCoordinateGenerator
     , TransformCoordinate * _pTransformCoordinate
-    , Grid * m_pGrid)
+    , Grid * m_pGrid
+    //, Coordinate & m_SpawnMainCharacterCoordinate
+)
 {
     if (BP_Hex)
     {
         FVector StartPoint = SpawnPoint->Bounds.Origin;
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 30; ++i)
         {
-            for (int j = 0; j < 10; ++j)
-            {
-                                Hex * hex = new Hex(i, j);
+            for (int j = 0; j < 30; ++j)
+            {  
+               
+                Hex * hex = new Hex(i, j);
+                FActorSpawnParameters spawnParams;
+                spawnParams.Template = Cast<AActor>(*BP_Hex);
                 
-                                m_pGrid->addNode(hex);
-                                FActorSpawnParameters spawnParams;
-                                spawnParams.Template = Cast<AActor>(*BP_Hex);
+                FTransform transform = GetTransform();
                 
-                                FTransform transform = GetTransform();
+                Coordinate * hex2dCoordinates = hex->Get2DCoordinates();
+                FVector locationVector(_pViewCoordinateGenerator->generateViewCoordinate(*hex2dCoordinates, StartPoint));
+                transform.SetLocation(locationVector);
                 
-                                Coordinate hex2dCoordinates = hex->Get2DCoordinates();
-                                FVector locationVector(_pViewCoordinateGenerator->generateViewCoordinate(hex2dCoordinates, StartPoint));
-                                transform.SetLocation(locationVector);
-                
-                                AHexActor * actor = GetWorld()->SpawnActor<AHexActor>(BP_Hex, transform, spawnParams);
-                                m_MapNodes.Add(actor);
-                //                actor->setViewCoordinate(m_MapDataGenerator.generateViewCoordinate(hex2dCoordinates));
-                                _pTransformCoordinate->addElement(actor, hex);
-                               /* if (i == 0 && j == 0)
-                                {
-                                     sourseActor = actor;
-                                }
+                AHexActor * actor = GetWorld()->SpawnActor<AHexActor>(BP_Hex, transform, spawnParams);
+               
+                m_MapNodes.Add(actor);
+                _pTransformCoordinate->addElement(actor, hex);
 
-                                if (i == 4 && j == 4)
-                                {
-                                    destinationActor = actor;
-                                }*/
+         
+                //GenerateBarriers(hex, transform, access);
+                m_pGrid->addNode(hex, actor->access); 
+             
             }
         }
-
+        
      //   pathSearch->RecalculateHexGrid();
       // FindPath(sourseActor, destinationActor);
 

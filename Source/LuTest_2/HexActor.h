@@ -15,6 +15,9 @@
 #include "HexActor.generated.h"
 
 class AGod;
+class ASkeletonArcherCharacter;
+enum StepAccessibility;
+
 
 UCLASS()
 class LUTEST_2_API AHexActor : public AActor
@@ -38,10 +41,23 @@ public:
         UStaticMeshComponent* Mesh;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-        USpringArmComponent* SpringArm;
+        UStaticMeshComponent* MeshBarrier;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-        UCameraComponent* Camera;
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+        bool access;
+
+    //UENUM ( BlueprintType)
+    //enum class StepAccessibility : uint8
+    //{
+    //    Empty,
+    //    haveBarriers
+    //}
+
+    //UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    //    USpringArmComponent* SpringArm;
+
+    //UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    //    UCameraComponent* Camera;
 
 
     UFUNCTION(BlueprintCallable)
@@ -50,13 +66,13 @@ public:
     UFUNCTION(BlueprintCallable)
         int IsInPathNumber();
 
-
     UFUNCTION(BlueprintCallable)
         void onClick();
 
-    /*UFUNCTION(BlueprintCallable)
+
+    UFUNCTION(BlueprintCallable)
         FVector GetLogicCoordinate();
-*/
+
     
 //    void setViewCoordinate(Coordinate & _coordinate);
  
@@ -66,6 +82,10 @@ public:
 
     void SetInPath(bool value);
     void SetInPathNumber(int value);
+
+    void SetMainCharacter(ASkeletonArcherCharacter * _character);
+    ASkeletonArcherCharacter * GetMainCharacter();
+
     /*   void setLogicPass();*/
     
 private:
@@ -74,6 +94,9 @@ private:
     int m_inPathNumber = -1;
 
     bool m_onClicked = false;
+
+
+    ASkeletonArcherCharacter * m_mainCharacter;
 
    // FVector m_viewCoordinate;
 

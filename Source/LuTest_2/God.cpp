@@ -2,15 +2,17 @@
 
 #include "God.h"
 
+#include "MyMapGenerator.h"
 #include "TransformCoordinate.hpp"
 #include "ViewCoordinateGenerator.hpp"
 #include "PathSearch.hpp"
-#include "MyMapGenerator.h"
 #include "HexActor.h"
 #include"Hex.hpp"
 #include"Grid.hpp"
 #include "GameState.hpp"
 
+#include "FightMapGenerator.h"
+#include "CameraFightUtility.h"
 
 #include "EngineUtils.h"
 #include "LogMacros.h"
@@ -49,7 +51,9 @@ void AGod::BeginPlay()
         spawnParams.Template = Cast<AActor>(*BP_MyMapGenerator);
         m_pAMyMapGenerator = GetWorld()->SpawnActor<AMyMapGenerator>(BP_MyMapGenerator, GetTransform(), spawnParams);
         GenerateMap();
+        GenerateMainCharacter();
     }
+   
 }
 
 // Called every frame
@@ -123,21 +127,34 @@ AMyMapGenerator & AGod::GetAMyMapGenerator()
 
  void AGod::СhangeGameState(AHexActor * actor)
  {
-     m_pGameState->addHex( actor);
+     if (m_pGrid->findNode(*m_pTransformCoordinate->getHexEngine(*actor))->m_acces != StepAccessibility::Empty)
+     {
+         return;
+     }
+
+     m_pGameState->addHex(actor);
+
      if (m_pPathSearch && !m_pPathSearch->IsPathEmpty())
-         {
-             EscapeActorHexFromPath();
-         }
+     {
+         EscapeActorHexFromPath();
+     }
+
      if (m_pGameState->GetCurentGameState() == GameStateField::selected2Hex)
      {
-        
          m_pPathSearch = new PathSearch(*m_pGrid);
          std::vector< Node *> inputPathVector;
          std::pair <AHexActor *, AHexActor* > pair = m_pGameState->GetClickActor();
-         Hex * _sourseHex = &m_pTransformCoordinate->getHexEngine(*pair.first);
-         Hex * _destinationHex = &m_pTransformCoordinate->getHexEngine(*pair.second);
+         Hex * _sourseHex = m_pTransformCoordinate->getHexEngine(*pair.first);
+         Hex * _destinationHex = m_pTransformCoordinate->getHexEngine(*pair.second);
          m_pPathSearch->CreatePath( _sourseHex, _destinationHex);
          inputPathVector = m_pPathSearch->GetPath();
+         if (inputPathVector.size() == 1)
+         {
+             m_pGameState->clearSelection();
+             m_pGameState->addHex(actor);
+
+             return;
+         }
          for (auto node : inputPathVector)
          {
              AHexActor * actorHex = &m_pTransformCoordinate->getAHexActor(*node->m_hex);
@@ -153,9 +170,43 @@ AMyMapGenerator & AGod::GetAMyMapGenerator()
 
 void AGod::HexActorOnClick(AHexActor * actor)
 {
-    СhangeGameState( actor);
+    СhangeGameState( actor); 
+   // UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Game/MyContent/Maps/FightMap"), TRAVEL_Absolute);
+   // ChangeLevel();
+
 }
 
+void AGod::GenerateMainCharacter()
+{
+    while (true)
+    {
+        //Coordinate coordinate(FMath::RandRange(0, 9), FMath::RandRange(0, 9), 0);
+        Coordinate coordinate(m_SpawnMainCharacterCoordinate);
+
+        Node * node = m_pGrid->GetNodeForCoordinates(coordinate);
+
+        if (node && node->m_acces == StepAccessibility::Empty)
+        {
+            m_pAMyMapGenerator->GenerateMainCharacter(m_pTransformCoordinate->getAHexActor(*node->m_hex), m_SpawnMainCharacterCoordinate);
+            break;
+        }
+      
+       
+    }
+}
+
+void AGod::ChangeLevel()
+{
+ //   UGameplayStatics::Get
+//    FString levelName = GetWorld()->GetMapName();
+
+    if (BP_FightMapGenerator)
+    {
+        FActorSpawnParameters spawnParams;
+        spawnParams.Template = Cast<AActor>(*BP_FightMapGenerator);
+        m_pFightMapGenerator = GetWorld()->SpawnActor<AFightMapGenerator>(BP_FightMapGenerator, GetTransform(), spawnParams);
+    }
+}
 
 //start copypaste
 //

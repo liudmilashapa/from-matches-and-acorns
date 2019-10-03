@@ -25,12 +25,14 @@ AHexActor & TransformCoordinate::getAHexActor(Hex  & hex)
     return *it->second;
 }
 
-Hex & TransformCoordinate::getHexEngine(AHexActor & actor)
+Hex * TransformCoordinate::getHexEngine(AHexActor & actor)
 {
     auto it = ActorHexToEngineHex.find(&actor);
-    check(it != ActorHexToEngineHex.end());
-    return *it->second;
-    
+    if (it != ActorHexToEngineHex.end())
+    {
+        return it->second;
+    }
+    else return nullptr;
    
 }
 

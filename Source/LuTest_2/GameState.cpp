@@ -16,7 +16,7 @@ std::pair <AHexActor *, AHexActor* > GameState::GetClickActor()
 
 void GameState::addHex(AHexActor * actor)
 {
-    if (!m_pSourseHexActor)
+    if (!m_pSourseHexActor && actor->GetMainCharacter())
     {
         m_pSourseHexActor = actor;
         m_curentFieldState = GameStateField::selected1Hex;
@@ -28,8 +28,13 @@ void GameState::addHex(AHexActor * actor)
     }
     else 
     {
-        m_pDestinationHexActor = nullptr;
-        m_pSourseHexActor = nullptr;
-        m_curentFieldState = GameStateField::clearField;
+        clearSelection();
     }
 }
+
+void GameState::clearSelection()
+{
+    m_pDestinationHexActor = m_pSourseHexActor = nullptr;
+    m_curentFieldState = GameStateField::clearField;
+}
+

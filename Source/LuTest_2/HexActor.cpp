@@ -2,6 +2,7 @@
 
 #include "HexActor.h"
 
+#include "Grid.hpp"
 #include "PathSearch.hpp"
 #include "Hex.hpp"
 #include "God.h"
@@ -12,6 +13,7 @@ AHexActor::AHexActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
     Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+    MeshBarrier = CreateDefaultSubobject<UStaticMeshComponent>("MeshBarrier");
     RootComponent = Mesh;
 }
 
@@ -34,12 +36,6 @@ void AHexActor::Tick(float DeltaTime)
 //    m_viewCoordinate = _coordinate;
 //}
 //
-//FVector AHexActor::GetLogicCoordinate()
-//{
-//    TransformCoordinate * transformCoordinate = TransformCoordinate::getInstance();
-//    return transformCoordinate->getHexEngine(*this).GetLogicCoordinates().ToFVector();
-//
-//}
 
 
 bool AHexActor::IsInPath()
@@ -71,6 +67,25 @@ void AHexActor::onClick()
     }*/
 }
 
+
+FVector AHexActor::GetLogicCoordinate()
+{
+    AGod * God = AGod::GetGodClass();
+    Hex * hex = God->GetTransformCoordinate().getHexEngine(*this);
+    if (hex)
+    {
+        return hex->Get2DCoordinates()->ToFVector();
+    }
+    else
+    {
+        return FVector(-1000, -1000, -1000); 
+    }
+
+}
+
+
+
+
 bool AHexActor::IsOnClick()
 {
     return m_onClicked;
@@ -86,6 +101,16 @@ void AHexActor::SetInPathNumber(int value)
     m_inPathNumber = value;
 
 
+}
+
+void AHexActor::SetMainCharacter(ASkeletonArcherCharacter * _character)
+{
+    m_mainCharacter = _character;
+}
+
+ASkeletonArcherCharacter * AHexActor::GetMainCharacter( )
+{
+    return m_mainCharacter;
 }
 
 //void AHexActor::onClick()

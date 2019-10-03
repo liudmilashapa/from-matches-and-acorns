@@ -13,7 +13,10 @@ enum class GameStateField
     selected1Hex,
     selected2Hex,
     change1Hex,
-    change2Hex
+    change2Hex,
+    selectedFinalHex,
+    characterMove,
+
 };
 
 
@@ -26,6 +29,7 @@ public:
     GameStateField GetCurentGameState();
     std::pair <AHexActor *, AHexActor* > GetClickActor();
     void addHex(AHexActor * actor);
+    void clearSelection();
 
 private:
 

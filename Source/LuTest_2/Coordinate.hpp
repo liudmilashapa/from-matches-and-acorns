@@ -16,6 +16,8 @@ public:
 
     Coordinate(int _x, int _y, int _z);
 
+    Coordinate(FVector & vector);
+
     bool IsEqual(Coordinate _coordinate1) const;
 
     int GetX();
@@ -27,4 +29,7 @@ public:
     void SetZ(int z);
 
     FVector ToFVector() const;
+
+
+    bool operator == (Coordinate & _coordinate);
 };

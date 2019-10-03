@@ -9,13 +9,13 @@ void Hex::setAxialCoordinates()
     m_logicCoordinate.SetZ(- m_logicCoordinate.GetX() - m_logicCoordinate.GetY());
 }
 
-Coordinate  Hex::Get2DCoordinates()
+Coordinate * Hex::Get2DCoordinates()
 {
-    return m_2dCoorditates;
+    return &m_2dCoorditates;
 }
 
-Coordinate Hex::GetLogicCoordinates()
+Coordinate * Hex::GetLogicCoordinates()
 {
-    return m_logicCoordinate;
+    return &m_logicCoordinate;
 }
 

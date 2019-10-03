@@ -13,11 +13,11 @@
 class ViewCoordinateGenerator
 {
 
-private:
+public:
 
-    const float innerRadius = 20.0;
+    static const float innerRadius;
 
-    const float outerRadius = innerRadius / 0.866025404f;
+    static const float outerRadius;// = innerRadius / 0.866025404f;
 
 public:
 

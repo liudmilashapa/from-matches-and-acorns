@@ -24,9 +24,10 @@ public:
 
     AHexActor &  getAHexActor(Hex  & hex);
     
-    Hex & getHexEngine(AHexActor & actor);
+    Hex * getHexEngine(AHexActor & actor);
 
     void Clear() { ActorHexToEngineHex.clear(); EngineHexToActorHex.clear(); }
 
+    
 //    bool IsLogicCoordinateValid(Coordinate &_coordinate);
 };

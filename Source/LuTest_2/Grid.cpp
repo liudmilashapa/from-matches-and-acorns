@@ -16,31 +16,46 @@ bool Grid::IsEmpty()
     return m_nodes.size() == 0;
 }
 
-void Grid::addNode(Hex * _hex)
+void Grid::addNode(Hex * _hex, bool access)
+{
+    addNodeWithotRecalculateHexGrid(_hex, access);
+    RecalculateHexGrid();
+
+}
+
+void Grid::addNode(Hex * _hex, StepAccessibility & access)
+{
+    addNodeWithotRecalculateHexGrid(_hex, access);
+    RecalculateHexGrid();
+
+}
+
+void Grid::addNodeWithotRecalculateHexGrid(Hex * _hex, StepAccessibility & access)
 {
     if (!findNode(*_hex))
     {
         Node * node = new Node();
         node->m_hex = _hex;
+        node->m_acces = access;
         m_nodes.push_back(node);
-        RecalculateHexGrid();
     }
 }
 
-void Grid::addNodeWithotRecalculateHexGrid(Hex * _hex)
+void Grid::addNodeWithotRecalculateHexGrid(Hex * _hex, bool access)
 {
-    if (findNode(*_hex))
+    if (!findNode(*_hex))
     {
         Node * node = new Node();
         node->m_hex = _hex;
+        node->m_acces = access ? StepAccessibility::Empty: StepAccessibility::haveBarriers;
         m_nodes.push_back(node);
     }
 }
 
 bool Grid::IsNeighbours(Node * left, Node * right) const
 {
-    Coordinate lhsCoords = left->m_hex->GetLogicCoordinates();
-    Coordinate rhsCoords = right->m_hex->GetLogicCoordinates();
+    Coordinate * lhsCoords = left->m_hex->GetLogicCoordinates();
+    Coordinate * rhsCoords = right->m_hex->GetLogicCoordinates();
 
     //if (
     //       (abs(lhsCoords.GetX() - rhsCoords.GetX()) > 1)
@@ -51,12 +66,20 @@ bool Grid::IsNeighbours(Node * left, Node * right) const
     //    return false;
     //}
 
-    return 
-        (  abs(lhsCoords.GetX() - rhsCoords.GetX())
-        +  abs(lhsCoords.GetY() - rhsCoords.GetY())
-        +  abs(lhsCoords.GetZ() - rhsCoords.GetZ())
-        )
-      == 2;
+    return
+        (
+           (
+            abs(lhsCoords->GetX() - rhsCoords->GetX())
+            + abs(lhsCoords->GetY() - rhsCoords->GetY())
+            + abs(lhsCoords->GetZ() - rhsCoords->GetZ())
+            )
+            == 2
+        &&
+            (
+                    left->m_acces == StepAccessibility::Empty 
+                &&  right->m_acces == StepAccessibility::Empty
+            )
+        );
 }
 
 void Grid::RecalculateHexGrid()
@@ -72,7 +95,7 @@ void Grid::RecalculateHexGrid()
     {
         for (int j = i + 1; j < nodesCount; ++j)
         {
-            if (IsNeighbours(m_nodes[i], m_nodes[j])) //crash
+            if (IsNeighbours(m_nodes[i], m_nodes[j])) 
             {
                 m_nodes[i]->m_neighbors.push_back(m_nodes[j]);
                 m_nodes[j]->m_neighbors.push_back(m_nodes[i]);
@@ -110,6 +133,19 @@ Node * Grid::findNode(Hex & source)
 std::vector<Node*>::iterator Grid::findNode(Node * source)
 {
     return std::find(m_nodes.begin(), m_nodes.end(), source);
+}
+
+
+Node * Grid::GetNodeForCoordinates(Coordinate & _logicCoordinate) 
+{
+    for (auto node : m_nodes)
+    {
+        if (*node->m_hex->Get2DCoordinates() == _logicCoordinate)
+        {
+            return node;
+        }
+    }
+    return nullptr;
 }
 
 std::vector<Node *> Grid::GetNeighbors(Hex * hex)

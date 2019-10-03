@@ -8,10 +8,12 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "God.generated.h"
 
-
+class AFightMapGenerator;
+class ACameraFightUtility;
 class PathSearch;
 class ViewCoordinateGenerator;
 class TransformCoordinate;
@@ -48,9 +50,14 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "WorldGeneration")
         TSubclassOf<AMyMapGenerator> BP_MyMapGenerator;
 
+    UPROPERTY(EditDefaultsOnly, Category = "WorldGeneration")
+        TSubclassOf<AFightMapGenerator> BP_FightMapGenerator;
+
     UPROPERTY(BlueprintReadWrite, Category = "WorldGeneration")
         AMyMapGenerator* MapGenerator;
 
+    UPROPERTY(BlueprintReadOnly, Category = "WorldGeneration")
+        FVector  m_SpawnMainCharacterCoordinate = FVector(10, 10, 0);
 
     UFUNCTION(BlueprintCallable, Category = "WorldGeneration")
         void FindPath(AHexActor * sourseActor, AHexActor * destinationActor);
@@ -93,14 +100,23 @@ public:
 
     void HexActorOnClick(AHexActor * actor);
 
+    void GenerateMainCharacter();
+
+    void ChangeLevel();
+
 private:
     
     static  AGod * p_instance;
+
+    AMyMapGenerator * m_pAMyMapGenerator;
     PathSearch * m_pPathSearch;
     ViewCoordinateGenerator * m_pViewCoordinateGenerator;
     TransformCoordinate * m_pTransformCoordinate;
-    AMyMapGenerator * m_pAMyMapGenerator;
     Grid * m_pGrid;
     GameState * m_pGameState;
     
+    AFightMapGenerator * m_pFightMapGenerator;
+    ACameraFightUtility * m_cameraFightUtility;
+
 };
+

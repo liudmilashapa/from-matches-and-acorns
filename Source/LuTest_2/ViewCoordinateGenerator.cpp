@@ -15,4 +15,7 @@ FVector ViewCoordinateGenerator::generateViewCoordinate(Coordinate & _2DCoordina
         return FVector(x, y, z);
 }
 
- 
+
+const float ViewCoordinateGenerator::innerRadius(20.0);
+
+const float ViewCoordinateGenerator::outerRadius(innerRadius / 0.866025404f);
