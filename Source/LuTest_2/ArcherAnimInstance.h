@@ -6,13 +6,15 @@
 #include "Animation/AnimInstance.h"
 #include "ArcherAnimInstance.generated.h"
 
+
 UENUM(BlueprintType)
 enum class EArcherAnimationState  : uint8
 {
     Idle,
     Jump,
     Death,
-    Shooting
+    Shooting,
+    Run
 };
 
 /**
@@ -22,8 +24,6 @@ UCLASS()
 class LUTEST_2_API UArcherAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
-	
-
 
 protected:
     /*True means that we're currently in air - or falling*/
@@ -40,6 +40,6 @@ protected:
 
 public:
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Enum)
         EArcherAnimationState ArcherAnimationState;
 };

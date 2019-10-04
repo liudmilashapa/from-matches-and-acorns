@@ -5,7 +5,7 @@
 #include "TransformCoordinate.hpp"
 
 
-
+class TransformCoordinate;
 class Grid;
 struct Node;
 
@@ -35,8 +35,13 @@ public:
     PathSearch(Grid & grid);
 
     bool IsPathEmpty();
-      
+     
     void CreatePath(Hex * source, Hex * destination);
+   
+    void SetIsInPathOnNode(Node * _node, int iteration);
+
+    void SetIsInPath();
+ 
 
     std::vector<Node *> GetPath();
 

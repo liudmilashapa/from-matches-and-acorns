@@ -11,8 +11,7 @@
 
 #include "MyMapGenerator.generated.h"
 
-class ABarrier_1;
-class ABarrier_2;
+
 class ATree;
 class Hex;
 class AHexActor;
@@ -20,6 +19,7 @@ class ViewCoordinateGenerator;
 class PathSearch;
 class Grid;
 class ASkeletonArcherCharacter;
+class ASkeletonGruntCharacter;
 enum StepAccessibility;
 
 UCLASS()
@@ -40,18 +40,13 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "MapNodeActorCreate")
         TSubclassOf<ASkeletonArcherCharacter> BP_ArcherCharacter;
 
-    //UPROPERTY(EditDefaultsOnly, Category = "MapNodeActorCreate")
-    //    TSubclassOf<ATree> BP_Tree;
+    UPROPERTY(EditDefaultsOnly, Category = "MapNodeActorCreate")
+        TSubclassOf<ASkeletonGruntCharacter> BP_GruntCharacter;
 
-    //UPROPERTY(EditDefaultsOnly, Category = "MapNodeActorCreate")
-    //    TSubclassOf<ABarrier_1> BP_Barrier_1;
+    void GenerateMainCharacter(AHexActor & _hexActor);
+    void GenerateEnemyCharacter(AHexActor & _hexActor);
 
-    //UPROPERTY(EditDefaultsOnly, Category = "MapNodeActorCreate")
-    //    TSubclassOf<ABarrier_2> BP_Barrier_2;
-
-    void GenerateMainCharacter(AHexActor & _hexActor, FVector & m_SpawnMainCharacterCoordinate);
-
-    void GenerateBarriers(Hex *hex, FTransform & transform, StepAccessibility & access);
+  //  void GenerateBarriers(Hex *hex, FTransform & transform, StepAccessibility & access);
 
     void GenerateMap
     (
@@ -73,7 +68,7 @@ private:
 
     TSet <AHexActor*> m_MapNodes;
     TSet <ATree*> m_MapTree;
-    TSet <ABarrier_1*> m_MapBarrier_1;
-    TSet <ABarrier_2*> m_MapBarrier_2;
     TSet <ASkeletonArcherCharacter*> m_SkeletonArcherCharacter;
+    TSet <ASkeletonGruntCharacter*> m_SkeletonGruntCharacter;
+
 };

@@ -10,6 +10,8 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include <vector>
+
 #include "God.generated.h"
 
 class AFightMapGenerator;
@@ -24,6 +26,8 @@ class AHexActor;
 class ViewCoordinateGenerator;
 class PathSearch;
 class Grid;
+struct Node;
+//enum class EArcherAnimationState : uint8;
 
 
 UCLASS()
@@ -102,6 +106,9 @@ public:
 
     void GenerateMainCharacter();
 
+    void GenerateEnemiesCharacter();
+
+
     void ChangeLevel();
 
 private:
@@ -118,5 +125,6 @@ private:
     AFightMapGenerator * m_pFightMapGenerator;
     ACameraFightUtility * m_cameraFightUtility;
 
+    std::vector<Node *> m_currentPath;
 };
 

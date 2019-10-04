@@ -2,10 +2,9 @@
 
 #include "MyMapGenerator.h"
 
-#include "Barrier_1.h"
-#include "Barrier_2.h"
 #include"Tree.h"
 #include "SkeletonArcherCharacter.h"
+#include "SkeletonGruntCharacter.h"
 #include "Hex.hpp"
 #include "Grid.hpp"
 #include "TransformCoordinate.hpp"
@@ -38,7 +37,7 @@ void AMyMapGenerator::Tick(float DeltaTime)
 
 }
 
-void AMyMapGenerator::GenerateMainCharacter(AHexActor & _hexActor, FVector & m_SpawnMainCharacterCoordinate)
+void AMyMapGenerator::GenerateMainCharacter(AHexActor & _hexActor)
 {
     if (BP_ArcherCharacter)
     {
@@ -55,6 +54,27 @@ void AMyMapGenerator::GenerateMainCharacter(AHexActor & _hexActor, FVector & m_S
         ASkeletonArcherCharacter * actor = GetWorld()->SpawnActor<ASkeletonArcherCharacter>(BP_ArcherCharacter, transform, spawnParams);
         m_SkeletonArcherCharacter.Add(actor);
         _hexActor.SetMainCharacter(actor);
+    }
+}
+
+void AMyMapGenerator::GenerateEnemyCharacter(AHexActor & _hexActor)
+{
+    if (BP_GruntCharacter)
+    {
+       
+        FActorSpawnParameters spawnParams;
+
+        FTransform transform = GetTransform();
+        FVector hexLocation = _hexActor.GetActorTransform().GetLocation();
+        //hexLocation.X -= ViewCoordinateGenerator::innerRadius / 2;
+        //hexLocation.Y -= ViewCoordinateGenerator::innerRadius / 2;
+
+        hexLocation.Z += 15;
+        transform.SetLocation(hexLocation);
+        transform.SetScale3D(FVector(0.15, 0.15, 0.15));
+        ASkeletonGruntCharacter * actor = GetWorld()->SpawnActor<ASkeletonGruntCharacter>(BP_GruntCharacter, transform, spawnParams);
+        m_SkeletonGruntCharacter.Add(actor);
+        _hexActor.addGruntCharacter(actor);
     }
 }
 

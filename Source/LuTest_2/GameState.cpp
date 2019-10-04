@@ -2,7 +2,8 @@
 #include "GameState.hpp"
 
 #include "HexActor.h"
-
+#include "SkeletonArcherCharacter.h"
+#include "ArcherAnimInstance.h"
 
 GameStateField GameState::GetCurentGameState()
 {
@@ -16,15 +17,29 @@ std::pair <AHexActor *, AHexActor* > GameState::GetClickActor()
 
 void GameState::addHex(AHexActor * actor)
 {
-    if (!m_pSourseHexActor && actor->GetMainCharacter())
+   
+    if (!m_pSourseHexActor)
     {
-        m_pSourseHexActor = actor;
-        m_curentFieldState = GameStateField::selected1Hex;
+       
+        if (actor->GetMainCharacter())
+        { 
+            actor->SetOnClick(true);
+            m_pSourseHexActor = actor;
+            m_curentFieldState = GameStateField::selected1Hex;
+        }
     }
-    else if (!m_pDestinationHexActor || actor != m_pSourseHexActor)
+    else if (actor != m_pSourseHexActor)
     {
-        m_pDestinationHexActor = actor;
-        m_curentFieldState = GameStateField::selected2Hex;
+        if (m_pDestinationHexActor && actor == m_pDestinationHexActor)
+        {
+            m_curentFieldState = GameStateField::selectedFinalHex;
+        }
+        else
+        {
+            m_pDestinationHexActor = actor;
+            m_curentFieldState = GameStateField::selected2Hex;
+            actor->SetOnClick(true);
+        }
     }
     else 
     {
@@ -32,8 +47,50 @@ void GameState::addHex(AHexActor * actor)
     }
 }
 
+void GameState::startMoveCharacter()
+{
+    ASkeletonArcherCharacter* pCharacter = m_pSourseHexActor->GetMainCharacter();
+
+    UArcherAnimInstance* asArcherAnimInst = Cast<UArcherAnimInstance>(pCharacter->GetMesh()->GetAnimInstance());
+
+    if (asArcherAnimInst)
+    {
+        asArcherAnimInst->ArcherAnimationState = EArcherAnimationState::Run;
+        m_curentFieldState = GameStateField::characterMove;
+    }
+}
+
+void GameState::endMoveCharacter()
+{
+    ASkeletonArcherCharacter* pCharacter = m_pSourseHexActor->GetMainCharacter();
+    UArcherAnimInstance* asArcherAnimInst = Cast<UArcherAnimInstance>(pCharacter->GetMesh()->GetAnimInstance());
+    if (asArcherAnimInst)
+    {
+        asArcherAnimInst->ArcherAnimationState = EArcherAnimationState::Idle;
+    }
+
+    m_pDestinationHexActor->SetMainCharacter(pCharacter);
+    m_pSourseHexActor->SetMainCharacter(nullptr);
+
+    clearSelection();
+}
+
+void GameState::changeState()
+{
+
+}
+
+
 void GameState::clearSelection()
 {
+    if (m_pSourseHexActor)
+    {
+        m_pSourseHexActor->SetOnClick(false);
+    }
+    if (m_pDestinationHexActor)
+    {
+        m_pDestinationHexActor->SetOnClick(false);
+    }
     m_pDestinationHexActor = m_pSourseHexActor = nullptr;
     m_curentFieldState = GameStateField::clearField;
 }

@@ -11,13 +11,23 @@
 #include "TransformCoordinate.hpp"
 #include "Coordinate.hpp"
 #include "CoreMinimal.h"
+#include <vector>
+
 
 #include "HexActor.generated.h"
 
 class AGod;
 class ASkeletonArcherCharacter;
+class ASkeletonGruntCharacter;
 enum StepAccessibility;
 
+UENUM(BlueprintType)
+enum class EIsInPath : uint8
+{
+    Empty,
+    InPath, 
+    EnemyNext
+};
 
 UCLASS()
 class LUTEST_2_API AHexActor : public AActor
@@ -46,6 +56,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
         bool access;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+        bool m_onClicked = false;
+
     //UENUM ( BlueprintType)
     //enum class StepAccessibility : uint8
     //{
@@ -60,8 +73,9 @@ public:
     //    UCameraComponent* Camera;
 
 
+
     UFUNCTION(BlueprintCallable)
-        bool IsInPath();
+        EIsInPath IsInPath();
 
     UFUNCTION(BlueprintCallable)
         int IsInPathNumber();
@@ -69,35 +83,44 @@ public:
     UFUNCTION(BlueprintCallable)
         void onClick();
 
+    UFUNCTION(BlueprintNativeEvent, Category = "Code And Blueprint Events")
+        void InPathChanged();
 
-    UFUNCTION(BlueprintCallable)
-        FVector GetLogicCoordinate();
-
+ /*   UFUNCTION(BlueprintCallable)
+        FVector & GetLogicCoordinate();
+*/
     
 //    void setViewCoordinate(Coordinate & _coordinate);
  
 public:
     
     bool IsOnClick();
+    void SetOnClick(bool click);
 
-    void SetInPath(bool value);
+    bool HasEnemy();
+
+    int GetMaxRangeOfDefeat();
+
+    void SetInPath(EIsInPath value);
     void SetInPathNumber(int value);
 
     void SetMainCharacter(ASkeletonArcherCharacter * _character);
+
     ASkeletonArcherCharacter * GetMainCharacter();
+
+    void addGruntCharacter(ASkeletonGruntCharacter * _grunt);
 
     /*   void setLogicPass();*/
     
 private:
 
-    bool m_inPath = false;
-    int m_inPathNumber = -1;
+    EIsInPath m_inPath = EIsInPath::Empty;
 
-    bool m_onClicked = false;
+    int m_inPathNumber = -1;
 
 
     ASkeletonArcherCharacter * m_mainCharacter;
-
+    std::vector< ASkeletonGruntCharacter * > m_GruntCharactersVector;
    // FVector m_viewCoordinate;
 
 };

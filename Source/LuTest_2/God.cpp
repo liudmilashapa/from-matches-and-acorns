@@ -7,12 +7,16 @@
 #include "ViewCoordinateGenerator.hpp"
 #include "PathSearch.hpp"
 #include "HexActor.h"
-#include"Hex.hpp"
-#include"Grid.hpp"
+#include "Hex.hpp"
+#include "Grid.hpp"
 #include "GameState.hpp"
 
+#include "SkeletonArcherCharacter.h"
+#include "ArcherAnimInstance.h"
 #include "FightMapGenerator.h"
 #include "CameraFightUtility.h"
+
+#include "Kismet/KismetMathLibrary.h"
 
 #include "EngineUtils.h"
 #include "LogMacros.h"
@@ -52,6 +56,7 @@ void AGod::BeginPlay()
         m_pAMyMapGenerator = GetWorld()->SpawnActor<AMyMapGenerator>(BP_MyMapGenerator, GetTransform(), spawnParams);
         GenerateMap();
         GenerateMainCharacter();
+        GenerateEnemiesCharacter();
     }
    
 }
@@ -65,6 +70,36 @@ void AGod::Tick(float DeltaTime)
     //{
     //    pathSearch->RecalculateHexGrid();
     //}
+
+    if (m_pGameState && m_pGameState->GetCurentGameState() == GameStateField::characterMove)
+    {
+ 
+        if (m_currentPath.size() == 0)
+        {
+            m_pGameState->endMoveCharacter();
+            return;
+        }
+
+        ASkeletonArcherCharacter * mainChar = m_pGameState->GetClickActor().first->GetMainCharacter();
+        FVector mainCharacterLocation = mainChar->GetActorLocation();
+
+        FVector destinationLocation = m_pTransformCoordinate->getAHexActor(*m_currentPath.back()->m_hex).GetActorLocation();
+        destinationLocation.Z = mainCharacterLocation.Z;
+
+        if (mainCharacterLocation.Equals(destinationLocation))
+        {
+            m_currentPath.pop_back();
+        }
+        else 
+        {
+            FVector newPosition = FMath::VInterpTo(mainCharacterLocation, destinationLocation,  DeltaTime, 5 );
+            
+            FVector rotationVector =  newPosition - mainChar->GetActorLocation();
+            FRotator  rotator = UKismetMathLibrary::MakeRotFromX(rotationVector);
+            //mainChar->SetActorRotation(FVector(0.0,0.0, rotator.Yaw)),
+            mainChar->SetActorLocationAndRotation(newPosition, rotator);
+        }
+    }
 }
 
 
@@ -119,26 +154,33 @@ AMyMapGenerator & AGod::GetAMyMapGenerator()
      for (auto hex : m_pPathSearch->GetHexInPath())
      { 
          AHexActor * actor = &m_pTransformCoordinate->getAHexActor(*hex);
-         actor->SetInPath(false);
+         actor->SetInPath(EIsInPath::Empty);
          actor->SetInPathNumber(-1);
+         actor->SetOnClick(false);
      }
  
  }
 
  void AGod::СhangeGameState(AHexActor * actor)
  {
+     if (m_pGameState->GetCurentGameState() == GameStateField::characterMove)
+     {
+         return;
+     }
+
      if (m_pGrid->findNode(*m_pTransformCoordinate->getHexEngine(*actor))->m_acces != StepAccessibility::Empty)
      {
          return;
      }
 
+    if (m_pPathSearch && !m_pPathSearch->IsPathEmpty())
+    {
+         EscapeActorHexFromPath();
+    }
+
      m_pGameState->addHex(actor);
 
-     if (m_pPathSearch && !m_pPathSearch->IsPathEmpty())
-     {
-         EscapeActorHexFromPath();
-     }
-
+    
      if (m_pGameState->GetCurentGameState() == GameStateField::selected2Hex)
      {
          m_pPathSearch = new PathSearch(*m_pGrid);
@@ -155,12 +197,24 @@ AMyMapGenerator & AGod::GetAMyMapGenerator()
 
              return;
          }
-         for (auto node : inputPathVector)
+      /*   for (auto node : inputPathVector)
          {
              AHexActor * actorHex = &m_pTransformCoordinate->getAHexActor(*node->m_hex);
-             actorHex->SetInPath(true);
-             actorHex->SetInPathNumber(node->m_path);
-         }
+             if (m_pPathSearch->IsEnemyNext(actorHex))
+             {
+                 actorHex->SetInPath(EIsInPath::EnemyNext);
+             }
+             else
+             {
+                 actorHex->SetInPath(EIsInPath::InPath);
+                 actorHex->SetInPathNumber(node->m_path);
+             }
+         }*/
+     }
+     if (m_pGameState->GetCurentGameState() == GameStateField::selectedFinalHex)
+     {
+         m_currentPath = m_pPathSearch->GetPath();
+         m_pGameState->startMoveCharacter();
      }
      if (m_pGameState->GetCurentGameState() == GameStateField::clearField)
      {
@@ -180,14 +234,13 @@ void AGod::GenerateMainCharacter()
 {
     while (true)
     {
-        //Coordinate coordinate(FMath::RandRange(0, 9), FMath::RandRange(0, 9), 0);
-        Coordinate coordinate(m_SpawnMainCharacterCoordinate);
+        Coordinate coordinate(FMath::RandRange(8, 12), FMath::RandRange(8, 12), 0);
 
         Node * node = m_pGrid->GetNodeForCoordinates(coordinate);
 
         if (node && node->m_acces == StepAccessibility::Empty)
         {
-            m_pAMyMapGenerator->GenerateMainCharacter(m_pTransformCoordinate->getAHexActor(*node->m_hex), m_SpawnMainCharacterCoordinate);
+            m_pAMyMapGenerator->GenerateMainCharacter(m_pTransformCoordinate->getAHexActor(*node->m_hex));
             break;
         }
       
@@ -195,6 +248,26 @@ void AGod::GenerateMainCharacter()
     }
 }
 
+void AGod::GenerateEnemiesCharacter()
+{
+    int enemyCount=0;
+    while (enemyCount < 20)
+    {
+
+        Coordinate coordinate(FMath::RandRange(0, 29), FMath::RandRange(0, 29), 0);
+
+        Node * node = m_pGrid->GetNodeForCoordinates(coordinate);
+        if (m_pTransformCoordinate->getAHexActor(*node->m_hex).GetMainCharacter() && !m_pTransformCoordinate->getAHexActor(*node->m_hex).HasEnemy())
+        {
+            continue;
+        }
+        if (node && node->m_acces == StepAccessibility::Empty)
+        {
+            m_pAMyMapGenerator->GenerateEnemyCharacter(m_pTransformCoordinate->getAHexActor(*node->m_hex));
+            enemyCount++;
+        }
+    }
+}
 void AGod::ChangeLevel()
 {
  //   UGameplayStatics::Get

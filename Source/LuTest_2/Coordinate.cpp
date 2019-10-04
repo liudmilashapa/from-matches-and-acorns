@@ -5,6 +5,7 @@ Coordinate::Coordinate(int _x, int _y, int _z)
     m_x = _x;
     m_y = _y;
     m_z = _z;
+    m_vectorCoordinate = FVector(_x, _y, _z);
 }
 
 Coordinate::Coordinate( FVector & vector)
@@ -12,6 +13,7 @@ Coordinate::Coordinate( FVector & vector)
     m_x = vector.X;
     m_y = vector.Y;
     m_z = vector.Z;
+    m_vectorCoordinate = vector;
 }
 
 bool Coordinate::IsEqual(Coordinate _coordinate1) const
@@ -50,9 +52,9 @@ void Coordinate::SetZ(int z)
     m_z = z;
 }
 
-FVector Coordinate::ToFVector() const
+FVector & Coordinate::GetFVector() 
 {
-    return FVector(m_x, m_y, m_z);
+    return m_vectorCoordinate;
 }
 
 bool Coordinate::operator == (Coordinate & _coordinate)

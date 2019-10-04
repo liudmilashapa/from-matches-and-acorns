@@ -4,18 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "SkeletonArcherCharacter.generated.h"
-
-enum class EArcherAnimationState : uint8;
+#include "SkeletonGruntCharacter.generated.h"
 
 UCLASS()
-class LUTEST_2_API ASkeletonArcherCharacter : public ACharacter
+class LUTEST_2_API ASkeletonGruntCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ASkeletonArcherCharacter();
+	ASkeletonGruntCharacter();
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,8 +29,6 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
         int RangeOfDefeat = 3;
 
-    int GetRangeOfDefeat();
-//    ChangeAnimationState();
 
-  //   EArcherAnimationState  * m_curentAnimationState;
+    int GetRangeOfDefeat();
 };

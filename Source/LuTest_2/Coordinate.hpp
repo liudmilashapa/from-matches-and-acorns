@@ -8,6 +8,7 @@ private:
     int m_x;
     int m_y;
     int m_z;
+    FVector m_vectorCoordinate;
 
 public:
 
@@ -23,12 +24,13 @@ public:
     int GetX();
     int GetY();
     int GetZ();
+ 
 
     void SetX(int x);
     void SetY(int y);
     void SetZ(int z);
 
-    FVector ToFVector() const;
+    FVector & GetFVector() ;
 
 
     bool operator == (Coordinate & _coordinate);

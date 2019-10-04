@@ -1,12 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SkeletonArcherCharacter.h"
-
-#include "ArcherAnimInstance.h"
+#include "SkeletonGruntCharacter.h"
 
 // Sets default values
-ASkeletonArcherCharacter::ASkeletonArcherCharacter()
+ASkeletonGruntCharacter::ASkeletonGruntCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -14,29 +12,28 @@ ASkeletonArcherCharacter::ASkeletonArcherCharacter()
 }
 
 // Called when the game starts or when spawned
-void ASkeletonArcherCharacter::BeginPlay()
+void ASkeletonGruntCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-  //  *m_curentAnimationState = EArcherAnimationState::Idle;
+	
 }
 
 // Called every frame
-void ASkeletonArcherCharacter::Tick(float DeltaTime)
+void ASkeletonGruntCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 // Called to bind functionality to input
-void ASkeletonArcherCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ASkeletonGruntCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
-
-int ASkeletonArcherCharacter::GetRangeOfDefeat()
+int ASkeletonGruntCharacter::GetRangeOfDefeat()
 {
     return RangeOfDefeat;
 }
+

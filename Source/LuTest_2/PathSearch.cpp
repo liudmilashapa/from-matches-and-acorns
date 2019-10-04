@@ -3,8 +3,11 @@
 #include "Grid.hpp"
 
 #include "PathSearch.hpp"
-
+#include "God.h"
+#include"HexActor.h"
+#include "TransformCoordinate.hpp"
 #include"Hex.hpp"
+
 
 PathSearch::PathSearch (Grid & grid)
 :m_grid(grid){}
@@ -140,6 +143,31 @@ void PathSearch::ConstructorPath(Hex * sourceHex, Hex * destinationHex, std::vec
     }
 }
 
+
+
+
+void PathSearch::SetIsInPath()
+{ 
+    AGod * God = AGod::GetGodClass();
+     
+    for (auto node : m_pPath)
+    {
+        AHexActor * actor = &God->GetTransformCoordinate().getAHexActor(*node->m_hex);
+        if (node->m_path == -1)
+        {
+            actor->SetInPath(EIsInPath::Empty);
+        }
+        else if (actor->HasEnemy())
+        {
+            actor->SetInPath(EIsInPath::EnemyNext);
+        }
+        else 
+        {
+            actor->SetInPath(EIsInPath::InPath);
+        }
+    }
+}
+
 void PathSearch::CreatePath(Hex * source, Hex * destination)
 {
     m_grid.RecalculateHexGrid();
@@ -148,6 +176,7 @@ void PathSearch::CreatePath(Hex * source, Hex * destination)
     SetAllPathes(sourceNode);
     m_pPath.push_back(destinationNode);
     ConstructorPath(*sourceNode, *destinationNode, m_pPath);
+    SetIsInPath();
 
  }
 
