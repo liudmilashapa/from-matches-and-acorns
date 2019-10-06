@@ -36,14 +36,7 @@ AGod::AGod()
     m_pTransformCoordinate = new TransformCoordinate();
     m_pGameState = new GameState();
 
-    //SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-    //Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-    //SpringArm->SetupAttachment(SpawnPoint);
-    //Camera->SetupAttachment(SpringArm);
-
-    
 }
-
 
 // Called when the game starts or when spawned
 void AGod::BeginPlay()
@@ -58,22 +51,23 @@ void AGod::BeginPlay()
         GenerateMainCharacter();
         GenerateEnemiesCharacter();
     }
-   
 }
 
 // Called every frame
 void AGod::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    //PathSearch * pathSearch = PathSearch::getInstance();
-    //if (!pathSearch->IsEmpty())
-    //{
-    //    pathSearch->RecalculateHexGrid();
-    //}
+
+    MoveMainCharacter();
+
+}
+
+void AGod::MoveMainCharacter()
+{
 
     if (m_pGameState && m_pGameState->GetCurentGameState() == GameStateField::characterMove)
     {
- 
+
         if (m_currentPath.size() == 0)
         {
             m_pGameState->endMoveCharacter();
@@ -86,46 +80,41 @@ void AGod::Tick(float DeltaTime)
         FVector destinationLocation = m_pTransformCoordinate->getAHexActor(*m_currentPath.back()->m_hex).GetActorLocation();
         destinationLocation.Z = mainCharacterLocation.Z;
 
-        if (mainCharacterLocation.Equals(destinationLocation))
-        {
+        if (mainCharacterLocation.Equals(destinationLocation) || FMath::IsNearlyEqual(m_currentLerpAlphaForMovement, 1.0f, 0.01f))
+        {   
+            
+
+            if (m_pTransformCoordinate->getAHexActor(*m_currentPath.back()->m_hex).HasEnemy())
+            {
+                 m_pGameState->endMoveCharacter();
+                 UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Game/MyContent/Maps/FightMap"), TRAVEL_Absolute);
+                 ChangeLevel();
+            }
+
+            m_currentActiveNode = m_currentPath.back();
+            m_currentLerpAlphaForMovement = 0;
+
             m_currentPath.pop_back();
         }
-        else 
+        else
         {
-            FVector newPosition = FMath::VInterpTo(mainCharacterLocation, destinationLocation,  DeltaTime, 5 );
-            
-            FVector rotationVector =  newPosition - mainChar->GetActorLocation();
+            m_currentLerpAlphaForMovement += 0.04;
+            FVector prevHexLocation = m_pTransformCoordinate->getAHexActor(*m_currentActiveNode->m_hex).GetActorLocation();
+            prevHexLocation.Z = mainCharacterLocation.Z;
+
+            FVector newPosition = FMath::Lerp(prevHexLocation, destinationLocation, m_currentLerpAlphaForMovement);
+
+            FVector rotationVector = newPosition - mainChar->GetActorLocation();
             FRotator  rotator = UKismetMathLibrary::MakeRotFromX(rotationVector);
-            //mainChar->SetActorRotation(FVector(0.0,0.0, rotator.Yaw)),
             mainChar->SetActorLocationAndRotation(newPosition, rotator);
         }
     }
-}
-
-
-
-void AGod::FindPath(AHexActor * sourseActor, AHexActor * destinationActor)
-{
-//    m_pPathSearch = new PathSearch(*m_pGrid);
-//    //    pathSearch->RecalculateHexGrid();
-//    Hex * sourseHex = &m_pTransformCoordinate->getHexEngine(*sourseActor);
-//    Hex * destinationHex = &m_pTransformCoordinate->getHexEngine(*destinationActor);
-//    m_pPathSearch->SetAllPathes(sourseHex);
-//    std::vector<Hex *> inputPath;
-//    m_pPathSearch->ConstructorPath(sourseHex, destinationHex, inputPath);
-//    for (auto hex : inputPath)
-//    {
-//        AHexActor * actorHex = &m_pTransformCoordinate->getAHexActor(*hex);
-//        actorHex->m_inPath = true;
-//    }
-//
 }
 
 void AGod::GenerateMap()
 {
     m_pAMyMapGenerator->GenerateMap(m_pViewCoordinateGenerator, m_pTransformCoordinate, m_pGrid);
 }
-
 
 
 PathSearch & AGod::GetPathSearch()
@@ -225,9 +214,6 @@ AMyMapGenerator & AGod::GetAMyMapGenerator()
 void AGod::HexActorOnClick(AHexActor * actor)
 {
     СhangeGameState( actor); 
-   // UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Game/MyContent/Maps/FightMap"), TRAVEL_Absolute);
-   // ChangeLevel();
-
 }
 
 void AGod::GenerateMainCharacter()
@@ -250,21 +236,20 @@ void AGod::GenerateMainCharacter()
 
 void AGod::GenerateEnemiesCharacter()
 {
-    int enemyCount=0;
-    while (enemyCount < 20)
+   
+    while (m_pAMyMapGenerator->SkeletonGruntCharacterCount()<20)
     {
 
         Coordinate coordinate(FMath::RandRange(0, 29), FMath::RandRange(0, 29), 0);
 
         Node * node = m_pGrid->GetNodeForCoordinates(coordinate);
-        if (m_pTransformCoordinate->getAHexActor(*node->m_hex).GetMainCharacter() && !m_pTransformCoordinate->getAHexActor(*node->m_hex).HasEnemy())
+        if (m_pTransformCoordinate->getAHexActor(*node->m_hex).GetMainCharacter() || m_pTransformCoordinate->getAHexActor(*node->m_hex).HasEnemy())
         {
             continue;
         }
         if (node && node->m_acces == StepAccessibility::Empty)
         {
             m_pAMyMapGenerator->GenerateEnemyCharacter(m_pTransformCoordinate->getAHexActor(*node->m_hex));
-            enemyCount++;
         }
     }
 }

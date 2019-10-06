@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "SkeletonGruntCharacter.generated.h"
 
+class CharacterInfo;
+
 UCLASS()
 class LUTEST_2_API ASkeletonGruntCharacter : public ACharacter
 {
@@ -29,6 +31,11 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
         int RangeOfDefeat = 3;
 
-
     int GetRangeOfDefeat();
+
+    CharacterInfo * GetCharacterInfo();
+
+private:
+
+    CharacterInfo * m_pGruntCharacterInfo;
 };

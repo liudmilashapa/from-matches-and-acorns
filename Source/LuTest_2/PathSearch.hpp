@@ -30,8 +30,6 @@ private:
 
 public:
 
-    //void findPath(const Coordinate & _coordinate);
-
     PathSearch(Grid & grid);
 
     bool IsPathEmpty();

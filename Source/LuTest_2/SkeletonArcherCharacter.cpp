@@ -3,6 +3,7 @@
 
 #include "SkeletonArcherCharacter.h"
 
+#include "CharacterInfo.h"
 #include "ArcherAnimInstance.h"
 
 // Sets default values
@@ -10,7 +11,7 @@ ASkeletonArcherCharacter::ASkeletonArcherCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+    m_pArcherCharacterInfo = new CharacterInfo(10, 3, 4);
 }
 
 // Called when the game starts or when spawned
@@ -39,4 +40,9 @@ void ASkeletonArcherCharacter::SetupPlayerInputComponent(UInputComponent* Player
 int ASkeletonArcherCharacter::GetRangeOfDefeat()
 {
     return RangeOfDefeat;
+}
+
+CharacterInfo * ASkeletonArcherCharacter::GetCharacterInfo()
+{
+    return m_pArcherCharacterInfo;
 }

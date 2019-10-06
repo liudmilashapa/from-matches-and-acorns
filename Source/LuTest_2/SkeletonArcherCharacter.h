@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "SkeletonArcherCharacter.generated.h"
 
+class CharacterInfo;
 enum class EArcherAnimationState : uint8;
 
 UCLASS()
@@ -32,6 +33,13 @@ public:
         int RangeOfDefeat = 3;
 
     int GetRangeOfDefeat();
+
+    CharacterInfo * GetCharacterInfo();
+
+private:
+
+    CharacterInfo * m_pArcherCharacterInfo;
+
 //    ChangeAnimationState();
 
   //   EArcherAnimationState  * m_curentAnimationState;

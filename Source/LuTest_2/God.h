@@ -64,9 +64,6 @@ public:
         FVector  m_SpawnMainCharacterCoordinate = FVector(10, 10, 0);
 
     UFUNCTION(BlueprintCallable, Category = "WorldGeneration")
-        void FindPath(AHexActor * sourseActor, AHexActor * destinationActor);
-
-    UFUNCTION(BlueprintCallable, Category = "WorldGeneration")
         void GenerateMap();
 
 
@@ -98,6 +95,8 @@ public:
      return p_instance;
     }
 
+    void MoveMainCharacter();
+
     void EscapeActorHexFromPath();
 
     void  СhangeGameState(AHexActor * actor);
@@ -126,5 +125,8 @@ private:
     ACameraFightUtility * m_cameraFightUtility;
 
     std::vector<Node *> m_currentPath;
+
+    Node* m_currentActiveNode = nullptr;
+    float m_currentLerpAlphaForMovement = 0;
 };
 

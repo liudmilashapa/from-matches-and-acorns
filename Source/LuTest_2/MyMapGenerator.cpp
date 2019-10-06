@@ -61,20 +61,27 @@ void AMyMapGenerator::GenerateEnemyCharacter(AHexActor & _hexActor)
 {
     if (BP_GruntCharacter)
     {
-       
+
         FActorSpawnParameters spawnParams;
 
         FTransform transform = GetTransform();
-        FVector hexLocation = _hexActor.GetActorTransform().GetLocation();
         //hexLocation.X -= ViewCoordinateGenerator::innerRadius / 2;
         //hexLocation.Y -= ViewCoordinateGenerator::innerRadius / 2;
 
-        hexLocation.Z += 15;
-        transform.SetLocation(hexLocation);
         transform.SetScale3D(FVector(0.15, 0.15, 0.15));
         ASkeletonGruntCharacter * actor = GetWorld()->SpawnActor<ASkeletonGruntCharacter>(BP_GruntCharacter, transform, spawnParams);
-        m_SkeletonGruntCharacter.Add(actor);
-        _hexActor.addGruntCharacter(actor);
+        if (actor)
+        {
+            m_SkeletonGruntCharacter.Add(actor);
+            _hexActor.addGruntCharacter(actor);
+
+            FVector actorLocation = _hexActor.GetActorTransform().GetLocation();
+            FRotator actorRotation = _hexActor.GetActorRotation();
+            actorLocation.Z += 10;
+            actorRotation.Yaw = FMath::FRandRange(0, 359);
+            actor->SetActorRotation(actorRotation);
+            actor->SetActorLocation(actorLocation);
+        }
     }
 }
 
@@ -118,19 +125,14 @@ void AMyMapGenerator::GenerateMap
              
             }
         }
-        
-     //   pathSearch->RecalculateHexGrid();
-      // FindPath(sourseActor, destinationActor);
+     
 
-
-
-        //  m_MapDataGenerator.GenerateSequence(pointsCount, Generator::ZoneKind::Rectangular, seed);
-
-        //uint32 index = 0;
-        //for (Generator::FloatPoint & point : m_MapDataGenerator)
-        //{
-        //    GenerateMapNodeActor(point, index);
-        //    index++;
-        //}
     }
 }
+
+
+int AMyMapGenerator::SkeletonGruntCharacterCount() 
+{
+    return m_SkeletonGruntCharacter.GetMaxIndex();
+}
+

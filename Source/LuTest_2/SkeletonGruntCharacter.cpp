@@ -3,12 +3,15 @@
 
 #include "SkeletonGruntCharacter.h"
 
+
+#include "CharacterInfo.h"
+
 // Sets default values
 ASkeletonGruntCharacter::ASkeletonGruntCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+    m_pGruntCharacterInfo = new CharacterInfo(12, 1, 3);
 }
 
 // Called when the game starts or when spawned
@@ -35,5 +38,10 @@ void ASkeletonGruntCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 int ASkeletonGruntCharacter::GetRangeOfDefeat()
 {
     return RangeOfDefeat;
+}
+
+CharacterInfo * ASkeletonGruntCharacter::GetCharacterInfo()
+{
+    return m_pGruntCharacterInfo;
 }
 
