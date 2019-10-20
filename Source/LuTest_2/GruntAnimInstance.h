@@ -11,10 +11,11 @@ enum class EGruntAnimationState : uint8
 {
     Idle,
     Jump,
+    Hit,
+    Spawn,
     Death,
     Shooting,
     Run,
-    Spawn
 };
 /**
  * 

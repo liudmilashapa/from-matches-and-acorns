@@ -60,8 +60,11 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "WorldGeneration")
         AMyMapGenerator* MapGenerator;
 
+ //   UPROPERTY(BlueprintReadOnly, Category = "WorldGeneration")
+ //      FVector  m_SpawnMainCharacterCoordinate = FVector(10, 10, 0);
+
     UPROPERTY(BlueprintReadOnly, Category = "WorldGeneration")
-        FVector  m_SpawnMainCharacterCoordinate = FVector(10, 10, 0);
+        bool m_IsLevelGenerated;
 
     UFUNCTION(BlueprintCallable, Category = "WorldGeneration")
         void GenerateMap();

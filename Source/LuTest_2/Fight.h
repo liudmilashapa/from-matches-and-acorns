@@ -11,6 +11,8 @@ enum class FightState
 
 class ASkeletonArcherCharacter;
 class ASkeletonGruntCharacter;
+enum class EArcherAnimationState : uint8;
+enum class EGruntAnimationState : uint8;
 
 enum class FightAction : uint8;
 
@@ -25,8 +27,10 @@ public:
 private:
 
     void MakeAction(FightAction _action);
+    void MakeReactionOnAction(FightAction _action);
     void ProcessAndChangeCurrentState();
     void MakeEnemyAction();
+
 
     ASkeletonArcherCharacter * m_mainCharActor;
     ASkeletonGruntCharacter * m_enemyCharActor;

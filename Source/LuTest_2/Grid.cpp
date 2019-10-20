@@ -57,15 +57,6 @@ bool Grid::IsNeighbours(Node * left, Node * right) const
     Coordinate * lhsCoords = left->m_hex->GetLogicCoordinates();
     Coordinate * rhsCoords = right->m_hex->GetLogicCoordinates();
 
-    //if (
-    //       (abs(lhsCoords.GetX() - rhsCoords.GetX()) > 1)
-    //    || (abs(lhsCoords.GetY() - rhsCoords.GetY()) > 1)
-    //    || (abs(lhsCoords.GetZ() - rhsCoords.GetZ()) > 1)
-    //    )
-    //{
-    //    return false;
-    //}
-
     return
         (
            (

@@ -19,6 +19,8 @@ enum class FightAction : uint8
 class Fight;
 class ASkeletonArcherCharacter;
 class ASkeletonGruntCharacter;
+enum class EArcherAnimationState : uint8;
+enum class EGruntAnimationState : uint8;
 
 UCLASS()
 class LUTEST_2_API AFightWorldManager : public AActor
@@ -28,6 +30,12 @@ class LUTEST_2_API AFightWorldManager : public AActor
 public:	
 
     static AFightWorldManager * GetInstance();
+
+    void ChangeMainCharacterStateToIdle();
+    void ChangeEnemyCharacterStateToIdle();
+
+    void SetMainCharacterAnimationState(EArcherAnimationState state);
+    void SetEnemyCharacterAnimationState(EGruntAnimationState state);
 
 	// Sets default values for this actor's properties
 	AFightWorldManager();
@@ -61,6 +69,12 @@ public:
     UFUNCTION(BlueprintImplementableEvent, Category = "Game Logic Events")
         void EnemyHealthStateUpdate(int currentHP, int maxHP);
 
+    UFUNCTION(BlueprintImplementableEvent, Category = "Game Logic Events")
+        void MainCharThrowStart();
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "Game Logic Events")
+        void EnemyCharThrowStart();
+
     UFUNCTION(BlueprintCallable, Category = "Game Logic Events")
         void SetInitialUIState();
 
@@ -70,4 +84,6 @@ private:
 
     static AFightWorldManager * ms_currentActiveInstance;
 
+    FTimerHandle MainCharTimerHandle;
+    FTimerHandle EnemyTimerHandle;
 };

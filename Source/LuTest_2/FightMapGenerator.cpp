@@ -39,7 +39,7 @@ void AFightMapGenerator::GenerateMainCharacter()
 
         FTransform transform = GetTransform();
 
-        transform.SetLocation(FVector(-4086, -9830, 470));
+        transform.SetLocation(FVector(-4086, -9561, 470));
         ASkeletonArcherCharacter * actor = GetWorld()->SpawnActor<ASkeletonArcherCharacter>(BP_ArcherCharacter, transform, spawnParams);
         m_SkeletonArcherCharacter.Add(actor);
     }

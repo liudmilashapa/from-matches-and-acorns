@@ -35,6 +35,7 @@ AGod::AGod()
     m_pViewCoordinateGenerator = new ViewCoordinateGenerator();
     m_pTransformCoordinate = new TransformCoordinate();
     m_pGameState = new GameState();
+    m_IsLevelGenerated = false;
 
 }
 
@@ -42,14 +43,18 @@ AGod::AGod()
 void AGod::BeginPlay()
 {
 	Super::BeginPlay();
-    if (BP_MyMapGenerator)
+    if (!m_IsLevelGenerated)
     {
-        FActorSpawnParameters spawnParams;
-        spawnParams.Template = Cast<AActor>(*BP_MyMapGenerator);
-        m_pAMyMapGenerator = GetWorld()->SpawnActor<AMyMapGenerator>(BP_MyMapGenerator, GetTransform(), spawnParams);
-        GenerateMap();
-        GenerateMainCharacter();
-        GenerateEnemiesCharacter();
+        if (BP_MyMapGenerator)
+        {
+            FActorSpawnParameters spawnParams;
+            spawnParams.Template = Cast<AActor>(*BP_MyMapGenerator);
+            m_pAMyMapGenerator = GetWorld()->SpawnActor<AMyMapGenerator>(BP_MyMapGenerator, GetTransform(), spawnParams);
+            GenerateMap();
+            GenerateMainCharacter();
+            GenerateEnemiesCharacter();
+            m_IsLevelGenerated = true;
+        }
     }
 }
 
@@ -87,7 +92,10 @@ void AGod::MoveMainCharacter()
             if (m_pTransformCoordinate->getAHexActor(*m_currentPath.back()->m_hex).HasEnemy())
             {
                  m_pGameState->endMoveCharacter();
-                 UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Game/MyContent/Maps/FightMap"), TRAVEL_Absolute);
+                     FLatentActionInfo LatentInfo;
+                     UGameplayStatics::LoadStreamLevel(this, "FightMap", true, true, LatentInfo);
+                     UGameplayStatics::UnloadStreamLevel(this, "HexMap", LatentInfo, true);
+                     //UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Game/MyContent/Maps/FightMap"), TRAVEL_Absolute);
                  ChangeLevel();
             }
 

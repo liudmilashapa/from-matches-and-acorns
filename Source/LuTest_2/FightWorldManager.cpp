@@ -6,7 +6,12 @@
 
 #include "SkeletonArcherCharacter.h"
 #include "SkeletonGruntCharacter.h"
+#include "GruntAnimInstance.h"
+#include "ArcherAnimInstance.h"
+
 #include "CharacterInfo.h"
+
+#include <thread>
 
 #include "God.h"
 #include "MyMapGenerator.h"
@@ -64,6 +69,37 @@ void AFightWorldManager::SetInitialUIState()
 AFightWorldManager * AFightWorldManager::GetInstance()
 {
     return ms_currentActiveInstance;
+}
+
+void AFightWorldManager::ChangeMainCharacterStateToIdle()
+{
+    UArcherAnimInstance* asArcherAnimInst = Cast<UArcherAnimInstance>(m_mainCharActor->GetMesh()->GetAnimInstance());
+    asArcherAnimInst->ArcherAnimationState = EArcherAnimationState::Idle;
+
+}
+
+void AFightWorldManager::ChangeEnemyCharacterStateToIdle()
+{
+    UGruntAnimInstance* asGruntAnimInst = Cast<UGruntAnimInstance>(m_enemyCharActor->GetMesh()->GetAnimInstance());
+    asGruntAnimInst->GruntAnimationState = EGruntAnimationState::Idle;
+}
+
+void AFightWorldManager::SetMainCharacterAnimationState(EArcherAnimationState state)
+{
+    UArcherAnimInstance* asArcherAnimInst = Cast<UArcherAnimInstance>(m_mainCharActor->GetMesh()->GetAnimInstance());
+    asArcherAnimInst->ArcherAnimationState = state;
+
+    GetWorld()->GetTimerManager().SetTimer(MainCharTimerHandle, this, &AFightWorldManager::ChangeMainCharacterStateToIdle, 3.0f, false);
+   // std::this_thread::sleep_for(std::chrono::milliseconds(420));
+}
+
+
+void AFightWorldManager::SetEnemyCharacterAnimationState(EGruntAnimationState state)
+{
+    UGruntAnimInstance* asGruntAnimInst = Cast<UGruntAnimInstance>(m_enemyCharActor->GetMesh()->GetAnimInstance());
+    asGruntAnimInst->GruntAnimationState = state;
+    GetWorld()->GetTimerManager().SetTimer(EnemyTimerHandle, this, &AFightWorldManager::ChangeEnemyCharacterStateToIdle, 3.0f, false);
+    //std::this_thread::sleep_for(std::chrono::milliseconds(420));
 }
 
 AFightWorldManager* AFightWorldManager::ms_currentActiveInstance(nullptr);
